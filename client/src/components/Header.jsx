@@ -7,7 +7,7 @@ const Header = () => {
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to="/">
-          <h1 className="font-bold test-sm sm:test-xl flex flex-wrap">
+          <h1 className="font-bold test-sm sm:test-xl flex flex-wrap gap-2">
             <span className="text-slate-500">Hawk Tuah</span>
             <span className="text-slate-700">Apartments</span>
           </h1>
