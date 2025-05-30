@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
-/*
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@font-face {
+  font-family: Agrandir;
+  font-weight: normal;
+
+  src: url("/graphic/fonts/Agrandir/Agrandir-WideBlackItalic.otf") format(".otf");
 }
+/*
+* {
+  font-family: Agrandir;
+} 
 */
 
 :root {
@@ -17,7 +21,7 @@ header {
 }
 body {
   background-color: light-dark(#ededed,#1b1d20);
-  
+  font-family: 'Agrandir', sans-serif;
 }
 
 footer {

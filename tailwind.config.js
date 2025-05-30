@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./src/**/*.{html,js,jsx,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        myfont: ['Agrandir', 'sans-serif'], // 'myfont' is now a usable class
+      },
+    },
   },
   plugins: [],
 }
