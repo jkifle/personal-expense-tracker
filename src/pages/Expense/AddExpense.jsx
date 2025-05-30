@@ -1,36 +1,33 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
+import { collection, addDoc, getFirestore } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 import "react-datepicker/dist/react-datepicker.css";
 
 const AddExpense = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [amountCash, setAmountCash] = useState("");
+  const [amountCash, setAmountCash] = useState(new Number());
   const [startDate, setStartDate] = useState(new Date());
-
   const [purpose, setPurpose] = useState("");
+  const [note, setNote] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-    } catch (error) {
-      switch (error.code) {
-        case "auth/wrong-password":
-          setErrorMessage("Incorrect password.");
-          break;
-        case "auth/user-not-found":
-          setErrorMessage("User not found. Please sign up.");
-          break;
-        case "auth/invalid-credential":
-          setErrorMessage("Incorrect email/password");
-          break;
-        default:
-          console.log(error);
-      }
-      setIsSigningIn(false);
-      return;
+      const docRef = await addDoc(collection(db, "userPortfolio"), {
+        cash: amountCash,
+        purpose: "Investment Purchase",
+      });
+      setAmountCash(new Number());
+      setPurpose("");
+      setStartDate(new Date());
+      setNote("");
+
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
     }
-    // insert doSendEmailVerification() if im tryna do 2 step no bot
   };
 
   return (
@@ -41,21 +38,37 @@ const AddExpense = () => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="number"
-          placeholder="Enter amount"
+          value={amountCash}
+          placeholder="$ Enter amount"
           className="border p-3 rounded-lg"
+          required
           id="amount"
           onChange={(e) => {
             setAmountCash(e.target.value);
           }}
         />
-        <DatePicker
-          className="border-1 rounded-lg p-3"
-          selected={startDate}
-          onChange={(date) => setStartDate(date)}
-        />
+        <div className="flex justify-between">
+          <DatePicker
+            className="border-1 rounded-lg p-3"
+            required
+            selected={startDate}
+            value={startDate}
+            onChange={(date) => setStartDate(date)}
+          />
+          <input
+            type="text"
+            placeholder="Enter note (optional)"
+            className="border p-3 rounded-lg w-43 lg:w-3xs md:w-3xs"
+            id="note"
+            value={note}
+            onChange={(e) => {
+              setNote(e.target.value);
+            }}
+          />
+        </div>
         <button
+          type="submit"
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-0"
-          onClick={handleSubmit}
         >
           Add
         </button>
@@ -67,5 +80,4 @@ const AddExpense = () => {
     </div>
   );
 };
-
 export default AddExpense;
