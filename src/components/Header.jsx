@@ -30,11 +30,15 @@ const Header = () => {
               Home
             </li>
           </Link>
-          <Link to="/overview">
-            <li className="hidden sm:inline lin text-slate-700 hover:underline">
-              Manager
-            </li>
-          </Link>
+          {userLoggedIn ? (
+            <Link to="/overview">
+              <li className="hidden sm:inline lin text-slate-700 hover:underline">
+                Manager
+              </li>
+            </Link>
+          ) : (
+            <></>
+          )}
           <Link to="/profile">
             {userLoggedIn ? (
               <img

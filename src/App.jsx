@@ -8,6 +8,8 @@ import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer.jsx";
 import AddExpense from "./pages/Expense/AddExpense.jsx";
+import NotFound from "./components/NotFound";
+
 const App = () => {
   return (
     <>
@@ -25,6 +27,7 @@ const App = () => {
 
                 <Route path="/profile" element={<Profile />} />
               </Route>
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
