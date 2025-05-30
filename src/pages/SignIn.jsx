@@ -60,7 +60,9 @@ const Login = () => {
   return (
     <div className="p-3 max-w-lg mx-auto">
       {userLoggedIn && <Navigate to={"/"} replace={true} />}
-      <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
+      <h1 className="text-3xl text-center font-semibold my-7 text-white">
+        Sign In
+      </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
@@ -95,9 +97,9 @@ const Login = () => {
         </button>
       </form>
       <div className="flex gap-2 mt-5">
-        <p>Dont an account?</p>
+        <p>Don't have an account?</p>
         <Link to={"/sign-up"}>
-          <span className="text-blue-700">Sign Up</span>
+          <span className="text-blue-300">Sign Up</span>
         </Link>
       </div>
       {errorMessage && (

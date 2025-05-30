@@ -84,6 +84,7 @@ const SignUp = () => {
             </label>
             <input
               disabled={isRegistering}
+              placeholder="Password"
               type="password"
               autoComplete="off"
               required

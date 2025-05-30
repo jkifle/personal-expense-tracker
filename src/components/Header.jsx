@@ -42,7 +42,7 @@ const Header = () => {
                 className="rounded-full h-7 w-7 object-cover"
               ></img>
             ) : (
-              <li className="sm:inline lin text-slate-700 ">Sign In</li>
+              <li className="sm:inline lin text-white">Sign In</li>
             )}
           </Link>
           {userLoggedIn ? (

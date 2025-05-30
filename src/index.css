@@ -1,10 +1,40 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/*
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+*/
+
+:root {
+  color-scheme: light dark;
+}
 header {
-  background-color: rgb(244, 237, 211);
+  
+  background-color: light-dark(white,#010409);
+}
+body {
+  background-color: light-dark(#ededed,#1b1d20);
+  
 }
 
-body {
-  background-color: rgb(165, 191, 204);
+footer {
+  
+  height: 5rem;
+  background-color: light-dark(white,#010409);
+}
+
+h1 {
+  color: light-dark(black, white);
+}
+
+li {
+  text-decoration: none; 
+  color: light-dark(#010409,white);
+}
+
+li:hover {
+  color: light-dark(black, azure);
 }
