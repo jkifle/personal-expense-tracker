@@ -1,30 +1,69 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
-import { collection, addDoc, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getFirestore,
+  updateDoc,
+  doc,
+  increment,
+  setDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase/firebase";
+import { useAuth } from "../../contexts/authContexts";
 
 import "react-datepicker/dist/react-datepicker.css";
 
 const AddExpense = () => {
+  const { currentUser } = useAuth();
   const [errorMessage, setErrorMessage] = useState("");
-  const [amountCash, setAmountCash] = useState(new Number());
+  const [amountCash, setAmountCash] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [purpose, setPurpose] = useState("");
   const [note, setNote] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const monthYearKey = `${
+      startDate.getMonth() + 1
+    }-${startDate.getFullYear()}`;
+
     try {
-      const docRef = await addDoc(collection(db, "userPortfolio"), {
-        cash: amountCash,
-        purpose: "Investment Purchase",
-      });
-      setAmountCash(new Number());
+      const docRef = await addDoc(
+        collection(db, "userPortfolios", currentUser.uid, "Expenses"),
+        {
+          cash: parseFloat(amountCash),
+          date: startDate,
+          note: note,
+        }
+      );
+      console.log("Expense added with ID:", docRef.id);
+      const monthlyTotalDocRef = await doc(
+        db,
+        "userPortfolios",
+        currentUser.uid,
+        "monthlyTotals",
+        monthYearKey
+      );
+      // Update the monthly total
+      try {
+        await updateDoc(monthlyTotalDocRef, {
+          totalOut: increment(parseFloat(amountCash)),
+        });
+      } catch (updateError) {
+        console.log("Creating new monthlyTotals doc...");
+        await setDoc(monthlyTotalDocRef, {
+          totalOut: parseFloat(amountCash),
+          totalIn: 0,
+          spendingRating: 0,
+        });
+      }
+
+      setAmountCash("");
       setPurpose("");
       setStartDate(new Date());
       setNote("");
-
-      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
