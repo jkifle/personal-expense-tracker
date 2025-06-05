@@ -7,7 +7,6 @@ const refreshRecentPurchases = async (uid, setExpenseData, numEntries) => {
     orderBy("date", "desc"),
     limit(numEntries)
   );
-  console.log(numEntries);
   const querySnapshot = await getDocs(q);
   const recentExpenses = querySnapshot.docs.map((docSnap) => ({
     docId: docSnap.id,

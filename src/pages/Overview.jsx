@@ -44,7 +44,6 @@ const Manager = () => {
           spendingRating: 0,
         });
         setTotalOut(0);
-        console.log("Initilized monthly total");
       } else {
         const data = docSnap.data();
         setTotalOut(data.totalOut);
@@ -65,7 +64,6 @@ const Manager = () => {
       date.getMonth() + 1,
       1
     );
-    console.log(startOfMonth + "  " + startOfNextMonth);
     const q = query(
       collection(db, "userPortfolios", uid, "Expenses"),
       where("date", ">=", startOfMonth),
