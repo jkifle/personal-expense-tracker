@@ -13,7 +13,8 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { useAuth } from "../contexts/authContexts";
-import Header from "../components/Header";
+import ExpenseCard from "../components/ExpenseCard.jsx";
+import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();
@@ -28,6 +29,7 @@ const Manager = () => {
     "monthlyTotals",
     monthYearKey
   );
+  const [expenseData, setExpenseData] = useState([]);
 
   useEffect(() => {
     const initializeAndRefresh = async () => {
@@ -50,6 +52,7 @@ const Manager = () => {
 
       // Auto-refresh calculation on load
       await refreshDataBase();
+      await refreshRecentPurchases(uid, setExpenseData, 3);
     };
 
     initializeAndRefresh();
@@ -78,7 +81,7 @@ const Manager = () => {
       const data = docSnap.data();
       const amount = parseFloat(data.cash || 0);
       await updateDoc(monthlyTotalDocRef, {
-        totalOut: increment(data.cash),
+        totalOut: increment(amount),
       });
     }
     // Re-fetch to reflect updated total
@@ -104,7 +107,7 @@ const Manager = () => {
       <div className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
           <label className="p-2 text-lg ">Recent purchases</label>
-          <Link to={"/purchase-history"}>
+          <Link to={"/expense-history"}>
             <ul className="border text-center p-2 rounded-lg  w-auto">
               View All
             </ul>
@@ -112,14 +115,15 @@ const Manager = () => {
         </div>
         {/* Purchase History */}
         <section className="mt-2 flex flex-col gap-2">
-          <div class="grid grid-cols-3 items-baseline-last">
-            <img className="w-15" src="../../graphic/img/jomango.jpg" />
-            <div>
-              <h4>Waffle House</h4>
-              <p>Panama City, Florida</p>
-            </div>
-            <p>$0</p>
-          </div>
+          {expenseData.map((receipt, index) => (
+            <ExpenseCard
+              key={index}
+              img={receipt.img}
+              name={receipt.name}
+              location={receipt.location}
+              cost={receipt.cost}
+            />
+          ))}
         </section>
       </div>
     </div>

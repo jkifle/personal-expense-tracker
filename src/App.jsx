@@ -9,6 +9,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer.jsx";
 import AddExpense from "./pages/Expense/AddExpense.jsx";
 import NotFound from "./components/NotFound";
+import ExpenseHistory from "./pages/Expense/ExpenseHistory.jsx";
 
 const App = () => {
   return (
@@ -24,7 +25,7 @@ const App = () => {
               <Route element={<PrivateRoute />}>
                 <Route path="/overview" element={<Overview />} />
                 <Route path="/add-expense" element={<AddExpense />} />
-
+                <Route path="/expense-history" element={<ExpenseHistory />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
               <Route path="*" element={<NotFound />} />
