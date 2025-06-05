@@ -2,6 +2,7 @@ import { FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authContexts";
 import { doSignOut } from "../firebase/auth.js";
+import { BiSolidDashboard } from "react-icons/bi";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -32,8 +33,8 @@ const Header = () => {
           </Link>
           {userLoggedIn ? (
             <Link to="/overview">
-              <li className="hidden sm:inline lin text-slate-700 hover:underline">
-                Manager
+              <li className="hidden sm:inline  text-slate-700 hover:underline">
+                <BiSolidDashboard className="items-center text-2xl" />
               </li>
             </Link>
           ) : (

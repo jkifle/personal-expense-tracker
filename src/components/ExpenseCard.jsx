@@ -1,6 +1,7 @@
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { useAuth } from "../contexts/authContexts";
+import { VscChromeClose } from "react-icons/vsc";
 
 const ExpenseCard = ({ img, name, location, cost, docId, onDelete }) => {
   const { currentUser } = useAuth();
@@ -29,7 +30,7 @@ const ExpenseCard = ({ img, name, location, cost, docId, onDelete }) => {
         className="justify-self-end mr-2 border p-2 bg-red-400 rounded-lg"
         onClick={deleteExpense}
       >
-        Delete
+        <VscChromeClose />
       </button>
     </div>
   );

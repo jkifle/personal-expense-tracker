@@ -15,6 +15,7 @@ import { db } from "../firebase/firebase";
 import { useAuth } from "../contexts/authContexts";
 import ExpenseCard from "../components/ExpenseCard.jsx";
 import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
+import { VscAdd } from "react-icons/vsc";
 
 const Manager = () => {
   const { currentUser } = useAuth();
@@ -89,7 +90,7 @@ const Manager = () => {
 
   return (
     <div>
-      <div className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l flex flex-col items-center justify-center bg-emerald-950">
+      <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l flex flex-col items-center justify-center bg-emerald-950">
         <div className="max-w-screen">
           <div className="p-3 text-lg">Spent this Month</div>
         </div>
@@ -98,11 +99,11 @@ const Manager = () => {
         </div>
         <Link to={"/add-expense"}>
           <ul className="border text-center p-2 rounded-lg max-w-3xs w-auto">
-            Add
+            <VscAdd />
           </ul>
         </Link>
-      </div>
-      <div className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
+      </section>
+      <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
           <label className="p-2 text-lg ">Recent purchases</label>
           <Link to={"/expense-history"}>
@@ -112,7 +113,7 @@ const Manager = () => {
           </Link>
         </div>
         {/* Purchase History */}
-        <section className="mt-2 flex flex-col gap-2">
+        <div className="mt-2 flex flex-col gap-2">
           {expenseData.map((receipt, index) => (
             <ExpenseCard
               key={index}
@@ -122,8 +123,30 @@ const Manager = () => {
               cost={receipt.cost}
             />
           ))}
-        </section>
-      </div>
+        </div>
+      </section>
+      <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
+        <div className="flex justify-between">
+          <label className="p-2 text-lg ">Recent purchases</label>
+          <Link to={"/expense-history"}>
+            <ul className="border text-center p-2 rounded-lg  w-auto">
+              View All
+            </ul>
+          </Link>
+        </div>
+        {/* Purchase History */}
+        <div className="mt-2 flex flex-col gap-2">
+          {expenseData.map((receipt, index) => (
+            <ExpenseCard
+              key={index}
+              img={receipt.img}
+              name={receipt.name}
+              location={receipt.location}
+              cost={receipt.cost}
+            />
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
