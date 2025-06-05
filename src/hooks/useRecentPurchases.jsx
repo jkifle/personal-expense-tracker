@@ -10,9 +10,10 @@ const refreshRecentPurchases = async (uid, setExpenseData, numEntries) => {
   console.log(numEntries);
   const querySnapshot = await getDocs(q);
   const recentExpenses = querySnapshot.docs.map((docSnap) => ({
-    img: "../graphic/img/jomango.jpg",
+    docId: docSnap.id,
+    img: "../../graphic/img/jomango.jpg",
     name: docSnap.data().note,
-    location: docSnap.data().date.toDate().toLocaleDateString(), // Format Firestore timestamp
+    location: docSnap.data().date.toDate().toLocaleDateString(),
     cost: docSnap.data().cash,
   }));
   setExpenseData(recentExpenses);

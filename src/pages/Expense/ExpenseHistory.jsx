@@ -6,11 +6,12 @@ const ExpenseHistory = () => {
   const { currentUser } = useAuth();
   const uid = currentUser.uid;
   const [expenseData, setExpenseData] = useState([]);
+  const entries = 4;
   useEffect(() => {
     const initializeAndRefresh = async () => {
       if (!uid) return;
 
-      await refreshRecentPurchases(uid, setExpenseData, 2);
+      await refreshRecentPurchases(uid, setExpenseData, entries);
     };
     initializeAndRefresh();
   }, [uid]);
@@ -24,10 +25,14 @@ const ExpenseHistory = () => {
         {expenseData.map((receipt, index) => (
           <ExpenseCard
             key={index}
+            docId={receipt.docId}
             img={receipt.img}
             name={receipt.name}
             location={receipt.location}
             cost={receipt.cost}
+            onDelete={() =>
+              refreshRecentPurchases(uid, setExpenseData, entries)
+            }
           />
         ))}
       </section>
