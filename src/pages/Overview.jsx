@@ -16,10 +16,12 @@ import { useAuth } from "../contexts/authContexts";
 import ExpenseCard from "../components/ExpenseCard.jsx";
 import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
 import { VscAdd } from "react-icons/vsc";
+import PlaidConnect from "../components/PlaidConnect.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();
   const uid = currentUser.uid;
+  const entries = 3;
   const date = new Date();
   const monthYearKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
   const [totalOut, setTotalOut] = useState(null);
@@ -31,6 +33,11 @@ const Manager = () => {
     monthYearKey
   );
   const [expenseData, setExpenseData] = useState([]);
+
+  const handleTransactions = (transactions) => {
+    console.log("Fetched transactions:", transactions);
+    // You can now store in Firebase or update your UI
+  };
 
   useEffect(() => {
     const initializeAndRefresh = async () => {
@@ -102,6 +109,7 @@ const Manager = () => {
             <VscAdd />
           </ul>
         </Link>
+        <PlaidConnect onSuccessTransactions={handleTransactions} />
       </section>
       <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
@@ -117,10 +125,14 @@ const Manager = () => {
           {expenseData.map((receipt, index) => (
             <ExpenseCard
               key={index}
+              docId={receipt.docId}
               img={receipt.img}
               name={receipt.name}
               location={receipt.location}
               cost={receipt.cost}
+              onDelete={() =>
+                refreshRecentPurchases(uid, setExpenseData, entries)
+              }
             />
           ))}
         </div>
