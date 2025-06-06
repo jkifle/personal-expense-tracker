@@ -18,6 +18,7 @@ import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
 import { VscAdd } from "react-icons/vsc";
 import PlaidConnect from "../components/PlaidConnect.jsx";
 import fetchAndStoreTransactions from "../hooks/fetchAndStoreTransactions.jsx";
+import MonthlyExpenseChart from "../components/MonthlyExpenseChart.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();
@@ -27,6 +28,7 @@ const Manager = () => {
   const monthYearKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
   const [totalOut, setTotalOut] = useState(null);
   const [expenseData, setExpenseData] = useState([]);
+  const [recentData, setRecentData] = useState([]);
   const monthlyTotalDocRef = doc(
     db,
     "userPortfolios",
@@ -34,11 +36,17 @@ const Manager = () => {
     "monthlyTotals",
     monthYearKey
   );
-
   const handleTransactions = (transactions) => {
     console.log("Fetched transactions:", transactions);
     // You can now store in Firebase or update your UI
   };
+  useEffect(() => {
+    if (expenseData.length > 0) {
+      const recent = expenseData.slice(0, 3);
+      setRecentData(recent);
+      console.log("Recent data sample:", recent);
+    }
+  }, [expenseData]);
 
   useEffect(() => {
     const initializeAndRefresh = async () => {
@@ -59,9 +67,9 @@ const Manager = () => {
       }
 
       // Auto-refresh calculation on load
-      await refreshDataBase();
       await fetchAndStoreTransactions(uid);
-      await refreshRecentPurchases(uid, setExpenseData, 3);
+      await refreshDataBase();
+      await refreshRecentPurchases(uid, setExpenseData, 100);
     };
 
     initializeAndRefresh();
@@ -91,11 +99,9 @@ const Manager = () => {
       await updateDoc(monthlyTotalDocRef, {
         totalOut: increment(amount),
       });
-      console.log(amount);
     }
     // Re-fetch to reflect updated total
     const updatedSnap = await getDoc(monthlyTotalDocRef);
-    console.log("Counting!!");
     setTotalOut(updatedSnap.data().totalOut);
   };
 
@@ -115,18 +121,19 @@ const Manager = () => {
         </Link>
         <PlaidConnect onSuccessTransactions={handleTransactions} />
       </section>
+      {/* Purchase History */}
       <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
-          <label className="p-2 text-lg ">Recent purchases</label>
+          <label className="p-2 text-lg ">Recent Purchases</label>
           <Link to={"/expense-history"}>
             <ul className="border text-center p-2 rounded-lg  w-auto">
               View All
             </ul>
           </Link>
         </div>
-        {/* Purchase History */}
+
         <div className="mt-2 flex flex-col gap-2">
-          {expenseData.map((receipt, index) => (
+          {recentData.map((receipt, index) => (
             <ExpenseCard
               key={index}
               docId={receipt.docId}
@@ -142,9 +149,10 @@ const Manager = () => {
           ))}
         </div>
       </section>
+      {/* Chart Display */}
       <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
-          <label className="p-2 text-lg ">Recent purchases</label>
+          <label className="p-2 text-lg ">Monthly Spent</label>
           <Link to={"/expense-history"}>
             <ul className="border text-center p-2 rounded-lg  w-auto">
               View All
@@ -152,16 +160,8 @@ const Manager = () => {
           </Link>
         </div>
         {/* Purchase History */}
-        <div className="mt-2 flex flex-col gap-2">
-          {expenseData.map((receipt, index) => (
-            <ExpenseCard
-              key={index}
-              img={receipt.img}
-              name={receipt.name}
-              location={receipt.location}
-              cost={receipt.cost}
-            />
-          ))}
+        <div className="mt-2 flex justify-center">
+          <MonthlyExpenseChart className="" expenses={expenseData} />
         </div>
       </section>
     </div>

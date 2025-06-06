@@ -1,6 +1,6 @@
 import axios from "axios";
 import { db } from "../firebase/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
 const fetchAndStoreTransactions = async (uid) => {
   try {
@@ -8,14 +8,23 @@ const fetchAndStoreTransactions = async (uid) => {
     const transactions = response.data;
 
     for (const txn of transactions) {
+      // Check for duplicates using transaction_id
+      const q = query(
+        collection(db, "userPortfolios", uid, "Expenses"),
+        where("transaction_id", "==", txn.transaction_id)
+      );
+      const existing = await getDocs(q);
+      if (!existing.empty) continue;
+
       const cleanTxn = {
         account_id: txn.account_id,
         amount: txn.amount,
         category: Array.isArray(txn.category)
           ? txn.category.join(" > ")
           : "Uncategorized",
-        date: txn.date,
+        date: new Date(txn.date),
         name: txn.name,
+        transaction_id: txn.transaction_id,
         createdAt: new Date(),
       };
 

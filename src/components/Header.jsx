@@ -2,7 +2,8 @@ import { FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authContexts";
 import { doSignOut } from "../firebase/auth.js";
-import { BiSolidDashboard } from "react-icons/bi";
+import { BiSolidDashboard, BiSolidHome } from "react-icons/bi";
+import { CgProfile } from "react-icons/cg";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -27,13 +28,13 @@ const Header = () => {
         </form>
         <ul className="flex gap-4">
           <Link to="/">
-            <li className="hidden sm:inline lin text-slate-700 hover:underline">
-              Home
+            <li>
+              <BiSolidHome className="items-center text-2xl" />
             </li>
           </Link>
           {userLoggedIn ? (
             <Link to="/overview">
-              <li className="hidden sm:inline  text-slate-700 hover:underline">
+              <li className="hidden sm:inline ">
                 <BiSolidDashboard className="items-center text-2xl" />
               </li>
             </Link>
@@ -42,10 +43,9 @@ const Header = () => {
           )}
           <Link to="/profile">
             {userLoggedIn ? (
-              <img
-                alt="profile"
-                className="rounded-full h-7 w-7 object-cover"
-              ></img>
+              <li className="hidden sm:inline">
+                <CgProfile className="items-center text-2xl" />
+              </li>
             ) : (
               <li className="sm:inline lin text-white">Sign In</li>
             )}

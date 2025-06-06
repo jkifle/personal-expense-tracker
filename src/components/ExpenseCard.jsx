@@ -14,6 +14,13 @@ const ExpenseCard = ({
 }) => {
   const { currentUser } = useAuth();
   const uid = currentUser.uid;
+  const dateConverted = date?.toDate?.()
+    ? date.toDate().toLocaleString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "Unknown date";
 
   const deleteExpense = async () => {
     const docRef = doc(db, "userPortfolios", uid, "Expenses", docId);
@@ -28,12 +35,12 @@ const ExpenseCard = ({
 
   return (
     <div className="grid grid-cols-8 items-center">
-      <img className="w-15" src={img} />
+      <img className="w-3/4" src={img} />
       <div className="ml-3 col-span-5">
         <h4 className="font-bold">{name}</h4>
         <div className="flex columns-2 gap-3">
           <p>{category}</p>
-          <p className=" justify-self-end">{date}</p>
+          <p className=" justify-self-end">{dateConverted}</p>
         </div>
       </div>
 

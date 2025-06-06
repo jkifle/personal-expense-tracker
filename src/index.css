@@ -40,5 +40,5 @@ li {
 }
 
 li:hover {
-   color: light-dark(black, azure);
+   color: light-dark(black, rgb(35, 75, 75));
 }
