@@ -27,9 +27,9 @@ const ExpenseCard = ({
   };
 
   return (
-    <div className="grid grid-cols-4 items-center">
+    <div className="grid grid-cols-8 items-center">
       <img className="w-15" src={img} />
-      <div>
+      <div className="ml-3 col-span-5">
         <h4 className="font-bold">{name}</h4>
         <div className="flex columns-2 gap-3">
           <p>{category}</p>

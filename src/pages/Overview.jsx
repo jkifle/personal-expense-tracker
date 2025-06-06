@@ -17,6 +17,7 @@ import ExpenseCard from "../components/ExpenseCard.jsx";
 import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
 import { VscAdd } from "react-icons/vsc";
 import PlaidConnect from "../components/PlaidConnect.jsx";
+import fetchAndStoreTransactions from "../hooks/fetchAndStoreTransactions.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();
@@ -25,6 +26,7 @@ const Manager = () => {
   const date = new Date();
   const monthYearKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
   const [totalOut, setTotalOut] = useState(null);
+  const [expenseData, setExpenseData] = useState([]);
   const monthlyTotalDocRef = doc(
     db,
     "userPortfolios",
@@ -32,7 +34,6 @@ const Manager = () => {
     "monthlyTotals",
     monthYearKey
   );
-  const [expenseData, setExpenseData] = useState([]);
 
   const handleTransactions = (transactions) => {
     console.log("Fetched transactions:", transactions);
@@ -59,6 +60,7 @@ const Manager = () => {
 
       // Auto-refresh calculation on load
       await refreshDataBase();
+      await fetchAndStoreTransactions(uid);
       await refreshRecentPurchases(uid, setExpenseData, 3);
     };
 
@@ -89,15 +91,17 @@ const Manager = () => {
       await updateDoc(monthlyTotalDocRef, {
         totalOut: increment(amount),
       });
+      console.log(amount);
     }
     // Re-fetch to reflect updated total
     const updatedSnap = await getDoc(monthlyTotalDocRef);
+    console.log("Counting!!");
     setTotalOut(updatedSnap.data().totalOut);
   };
 
   return (
     <div>
-      <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l flex flex-col items-center justify-center bg-emerald-950">
+      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l flex flex-col items-center justify-center bg-emerald-950">
         <div className="max-w-screen">
           <div className="p-3 text-lg">Spent this Month</div>
         </div>
@@ -111,7 +115,7 @@ const Manager = () => {
         </Link>
         <PlaidConnect onSuccessTransactions={handleTransactions} />
       </section>
-      <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
+      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
           <label className="p-2 text-lg ">Recent purchases</label>
           <Link to={"/expense-history"}>
@@ -138,7 +142,7 @@ const Manager = () => {
           ))}
         </div>
       </section>
-      <section className="mt-3 border p-3 max-w-lg mx-auto rounded-lg l  bg-emerald-950">
+      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
           <label className="p-2 text-lg ">Recent purchases</label>
           <Link to={"/expense-history"}>

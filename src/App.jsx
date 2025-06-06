@@ -24,6 +24,7 @@ const App = () => {
               <Route path="/sign-up" element={<SignUp />} />
               <Route element={<PrivateRoute />}>
                 <Route path="/overview" element={<Overview />} />
+
                 <Route path="/add-expense" element={<AddExpense />} />
                 <Route path="/expense-history" element={<ExpenseHistory />} />
                 <Route path="/profile" element={<Profile />} />

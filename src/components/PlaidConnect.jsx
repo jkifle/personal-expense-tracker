@@ -1,36 +1,56 @@
-import { useEffect, useState } from "react";
-import { usePlaidLink } from "react-plaid-link";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { usePlaidLink } from "react-plaid-link";
 
-export default function PlaidConnect({ onSuccessTransactions }) {
+const PlaidConnect = () => {
   const [linkToken, setLinkToken] = useState(null);
 
+  // 1. Request a link token from your backend
   useEffect(() => {
     const createLinkToken = async () => {
-      const res = await axios.post("http://localhost:8000/create_link_token");
-      setLinkToken(res.data.link_token);
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/create_link_token"
+        );
+        setLinkToken(response.data.link_token);
+      } catch (error) {
+        console.error("Error creating link token:", error);
+      }
     };
+
     createLinkToken();
   }, []);
 
-  const onSuccess = async (public_token) => {
-    await axios.post("http://localhost:8000/exchange_token", { public_token });
-    const response = await axios.get("http://localhost:8000/transactions");
-    onSuccessTransactions(response.data);
+  // 2. Define success handler when user links account
+  const onSuccess = async (public_token, metadata) => {
+    try {
+      // 3. Exchange public token for access token
+      await axios.post("http://localhost:8000/exchange_token", {
+        public_token: public_token,
+      });
+      console.log("Public token exchanged");
+
+      // 4. Optional: Fetch transactions
+      const response = await axios.get("http://localhost:8000/transactions");
+      console.log("Transactions:", response.data);
+    } catch (error) {
+      console.error("Error in onSuccess:", error);
+    }
   };
 
+  // 5. Hook into Plaid Link with the token
   const { open, ready } = usePlaidLink({
     token: linkToken,
-    onSuccess,
+    onSuccess: onSuccess,
   });
 
   return (
-    <button
-      className="mt-3 p-2 border rounded-lg"
-      onClick={() => open()}
-      disabled={!ready}
-    >
-      Connect Bank Account
-    </button>
+    <div>
+      <button onClick={() => open()} disabled={!ready}>
+        Connect Your Bank
+      </button>
+    </div>
   );
-}
+};
+
+export default PlaidConnect;

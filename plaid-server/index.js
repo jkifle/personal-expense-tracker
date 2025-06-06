@@ -40,35 +40,42 @@ app.post('/create_link_token', async (req, res) => {
     }
 });
 
-app.post('/exchange_token', async (req, res) => {
+app.post("/exchange_token", async (req, res) => {
     try {
-        const { public_token } = req.body;
-        const tokenResponse = await plaidClient.itemPublicTokenExchange({ public_token });
+        const publicToken = req.body.public_token;
+        const tokenResponse = await plaidClient.itemPublicTokenExchange({ public_token: publicToken });
         accessToken = tokenResponse.data.access_token;
         res.json({ access_token: accessToken });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error exchanging token');
+        console.error("Exchange error:", error.response?.data || error.message);
+        res.status(500).send("Failed to exchange public token");
     }
 });
 
-app.get('/transactions', async (req, res) => {
+app.get("/transactions", async (req, res) => {
     try {
-        const today = new Date().toISOString().split('T')[0];
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - 30);
-        const thirtyDaysAgo = pastDate.toISOString().split('T')[0];
+        console.log("🧪 Getting transactions...");
+        console.log("🔐 accessToken:", accessToken); // see if accessToken is null
+
+        if (!accessToken) {
+            return res.status(400).send("No access token. Link a bank account first.");
+        }
+
+        const today = new Date().toISOString().split("T")[0];
+        const past = new Date();
+        past.setDate(past.getDate() - 30);
+        const thirtyDaysAgo = past.toISOString().split("T")[0];
 
         const txns = await plaidClient.transactionsGet({
-            access_token,
+            access_token: accessToken,
             start_date: thirtyDaysAgo,
             end_date: today,
         });
 
         res.json(txns.data.transactions);
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error fetching transactions');
+        console.error("🔥 Error in /transactions:", error.response?.data || error.message || error);
+        res.status(500).send("Error fetching transactions");
     }
 });
 

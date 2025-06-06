@@ -12,7 +12,7 @@ const refreshRecentPurchases = async (uid, setExpenseData, numEntries) => {
     docId: docSnap.id,
     img: "../../graphic/img/jomango.jpg",
     name: docSnap.data().name,
-    date: docSnap.data().date.toDate().toLocaleDateString(),
+    date: docSnap.data().date,
     amount: docSnap.data().amount,
     category: docSnap.data().category,
   }));
