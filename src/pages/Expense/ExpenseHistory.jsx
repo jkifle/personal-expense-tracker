@@ -28,8 +28,9 @@ const ExpenseHistory = () => {
             docId={receipt.docId}
             img={receipt.img}
             name={receipt.name}
-            location={receipt.location}
-            cost={receipt.cost}
+            category={receipt.category}
+            amount={receipt.amount}
+            date={receipt.date}
             onDelete={() =>
               refreshRecentPurchases(uid, setExpenseData, entries)
             }

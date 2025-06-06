@@ -11,9 +11,10 @@ const refreshRecentPurchases = async (uid, setExpenseData, numEntries) => {
   const recentExpenses = querySnapshot.docs.map((docSnap) => ({
     docId: docSnap.id,
     img: "../../graphic/img/jomango.jpg",
-    name: docSnap.data().note,
-    location: docSnap.data().date.toDate().toLocaleDateString(),
-    cost: docSnap.data().cash,
+    name: docSnap.data().name,
+    date: docSnap.data().date.toDate().toLocaleDateString(),
+    amount: docSnap.data().amount,
+    category: docSnap.data().category,
   }));
   setExpenseData(recentExpenses);
 };

@@ -85,7 +85,7 @@ const Manager = () => {
 
     for (const docSnap of querySnapshot.docs) {
       const data = docSnap.data();
-      const amount = parseFloat(data.cash || 0);
+      const amount = parseFloat(data.amount || 0);
       await updateDoc(monthlyTotalDocRef, {
         totalOut: increment(amount),
       });
@@ -128,8 +128,9 @@ const Manager = () => {
               docId={receipt.docId}
               img={receipt.img}
               name={receipt.name}
-              location={receipt.location}
-              cost={receipt.cost}
+              category={receipt.category}
+              amount={receipt.amount}
+              date={receipt.date}
               onDelete={() =>
                 refreshRecentPurchases(uid, setExpenseData, entries)
               }

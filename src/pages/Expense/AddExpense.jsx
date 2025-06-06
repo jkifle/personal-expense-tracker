@@ -19,8 +19,9 @@ const AddExpense = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [amountCash, setAmountCash] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-  const [purpose, setPurpose] = useState("");
+  const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
+  const [name, setName] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,9 +34,11 @@ const AddExpense = () => {
       const docRef = await addDoc(
         collection(db, "userPortfolios", currentUser.uid, "Expenses"),
         {
-          cash: parseFloat(amountCash),
+          amount: parseFloat(amountCash),
           date: startDate,
-          note: note,
+          name: name,
+          category: category,
+          createdAt: new Date(),
         }
       );
       console.log("Expense added with ID:", docRef.id);
@@ -61,9 +64,10 @@ const AddExpense = () => {
       }
 
       setAmountCash("");
-      setPurpose("");
-      setStartDate(new Date());
       setNote("");
+      setName("");
+      setStartDate(new Date());
+      setCategory("");
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -96,7 +100,30 @@ const AddExpense = () => {
           />
           <input
             type="text"
-            placeholder="Enter note (optional)"
+            placeholder="Vendor name"
+            className="border p-3 rounded-lg w-43 lg:w-3xs md:w-3xs"
+            id="name"
+            value={name}
+            required
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+          />
+        </div>
+        <div className="flex justify-between">
+          <input
+            type="text"
+            placeholder="Category"
+            className="border p-3 rounded-lg lg:w-auto md:w-auto"
+            id="category"
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Note (optional)"
             className="border p-3 rounded-lg w-43 lg:w-3xs md:w-3xs"
             id="note"
             value={note}
