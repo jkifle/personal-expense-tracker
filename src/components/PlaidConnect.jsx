@@ -45,9 +45,17 @@ const PlaidConnect = () => {
   });
 
   return (
-    <div>
-      <button onClick={() => open()} disabled={!ready}>
-        Connect Your Bank
+    <div className="">
+      <button
+        className="border flex justify-center bg-white rounded-lg p-1 w-1/8"
+        onClick={() => open()}
+        disabled={!ready}
+      >
+        <img
+          className="w-2/3"
+          src="../../graphic/img/PlaidIcon.jpg"
+          alt="Connet Your Bank with Plaid"
+        />
       </button>
     </div>
   );

@@ -107,24 +107,26 @@ const Manager = () => {
 
   return (
     <div>
-      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l flex flex-col items-center justify-center bg-emerald-950">
-        <div className="max-w-screen">
-          <div className="p-3 text-lg">Spent this Month</div>
-        </div>
-        <div className="text-6xl text-center p-3 rounded-lg max-w-xs w-auto">
+      <section className="border p-3 max-w-4/6 mx-auto rounded-lg flex flex-col items-center bg-emerald-950">
+        <label className="p-3 text-lg font-black">Spent this Month</label>
+
+        <div className="p-2 text-6xl col-start-2 rounded-lg max-w-xs w-auto">
           {totalOut !== null ? `$${totalOut}` : "..."}
         </div>
-        <Link to={"/add-expense"}>
-          <ul className="border text-center p-2 rounded-lg max-w-3xs w-auto">
-            <VscAdd />
-          </ul>
-        </Link>
-        <PlaidConnect onSuccessTransactions={handleTransactions} />
+        <div className="flex flex-row gap-3">
+          <Link className="" to={"/add-expense"}>
+            <ul className="border w-auto text-center p-3 rounded-lg ">
+              <VscAdd />
+            </ul>
+          </Link>
+
+          <PlaidConnect onSuccessTransactions={handleTransactions} />
+        </div>
       </section>
       {/* Purchase History */}
       <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
-          <label className="p-2 text-lg ">Recent Purchases</label>
+          <label className="p-2 text-lg font-black">Recent Purchases</label>
           <Link to={"/expense-history"}>
             <ul className="border text-center p-2 rounded-lg  w-auto">
               View All
@@ -152,7 +154,7 @@ const Manager = () => {
       {/* Chart Display */}
       <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
         <div className="flex justify-between">
-          <label className="p-2 text-lg ">Monthly Spent</label>
+          <label className="p-2 text-lg font-black">Monthly Spent</label>
           <Link to={"/expense-history"}>
             <ul className="border text-center p-2 rounded-lg  w-auto">
               View All

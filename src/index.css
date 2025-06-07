@@ -18,6 +18,7 @@
 header {
   
   background-color: light-dark(white,#010409);
+  margin-bottom: 2rem;
 }
 body {
   background-color: light-dark(#ededed,#1b1d20);
@@ -26,7 +27,7 @@ body {
 
 footer {
   
-  
+  margin-top: 2rem;
   background-color: light-dark(white,#010409);
 }
 
