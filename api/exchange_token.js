@@ -25,9 +25,16 @@ export default async function handler(req, res) {
         }
 
         // Exchange public token for access token
-        const exchangeResponse = await plaidClient.itemPublicTokenExchange({
-            public_token,
-        });
+        try {
+            const exchangeResponse = await plaidClient.itemPublicTokenExchange({
+                public_token,
+            });
+            console.log("Plaid exchange response:", exchangeResponse.data);
+        } catch (error) {
+            console.error("Plaid exchange error:", error.response?.data || error.message);
+            return res.status(500).json({ error: "Failed to exchange token" });
+        }
+
 
         const accessToken = exchangeResponse.data.access_token;
 
