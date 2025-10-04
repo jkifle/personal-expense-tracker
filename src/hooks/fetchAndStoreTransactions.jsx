@@ -4,20 +4,20 @@ import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
 const fetchAndStoreTransactions = async (uid) => {
   if (!uid) {
-    console.error("UID not provided, cannot fetch transactions");
+    console.error("Missing UID in fetchAndStoreTransactions");
     return;
   }
 
   try {
-    const response = await axios.get(`/api/transactions?uid=${uid}`);
+    const response = await axios.get("/api/transactions", { params: { uid } });
     const transactions = response.data;
 
     for (const txn of transactions) {
+      // Check for duplicates
       const q = query(
         collection(db, "userPortfolios", uid, "Expenses"),
         where("transaction_id", "==", txn.transaction_id)
       );
-
       const existing = await getDocs(q);
       if (!existing.empty) continue;
 
@@ -36,9 +36,12 @@ const fetchAndStoreTransactions = async (uid) => {
       await addDoc(collection(db, "userPortfolios", uid, "Expenses"), cleanTxn);
     }
 
-    console.log("Transactions saved to Firestore!");
+    console.log(`Transactions for user ${uid} saved to Firestore!`);
   } catch (err) {
-    console.error("Error fetching/storing transactions:", err);
+    console.error(
+      "Error fetching/storing transactions:",
+      err.response?.data || err.message || err
+    );
   }
 };
 

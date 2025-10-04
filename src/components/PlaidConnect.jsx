@@ -15,9 +15,13 @@ const PlaidConnect = () => {
         const response = await axios.post("/api/create_link_token", {
           uid: currentUser.uid,
         });
+        console.log("Link token response:", response.data);
         setLinkToken(response.data.link_token);
       } catch (error) {
-        console.error("Error creating link token:", error);
+        console.error(
+          "Error creating link token:",
+          error.response?.data || error.message
+        );
       }
     };
 
