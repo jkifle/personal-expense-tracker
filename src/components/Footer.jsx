@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="flex flex-row flex-wrap items-center justify-center gap-y-6 gap-x-12 text-center md:justify-between">
         <Link to={"/"}>
           <img
-            src="../../graphic/img/jomango.jpg"
+            src="../../public/graphic/img/jomango.jpg"
             alt="logo-ct"
             className="m-2 w-16"
           />

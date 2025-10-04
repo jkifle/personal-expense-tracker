@@ -53,8 +53,8 @@ const PlaidConnect = () => {
       >
         <img
           className="w-2/3"
-          src="../../graphic/img/PlaidIcon.jpg"
-          alt="Connet Your Bank with Plaid"
+          src="../../public/graphic/img/PlaidIcon.jpg"
+          alt="Connect Your Bank with Plaid"
         />
       </button>
     </div>
