@@ -12,7 +12,7 @@ export default function PlaidConnect() {
 
     const createLinkToken = async () => {
       try {
-        const res = await axios.post("/api/create_link_token", {
+        const res = await axios.get("/api/create_link_token", {
           uid: currentUser.uid,
         });
         setLinkToken(res.data.link_token);
@@ -33,7 +33,10 @@ export default function PlaidConnect() {
       await axios.post("/api/exchange_token", { public_token, uid });
       console.log("Token exchanged for UID:", uid);
 
-      const txns = await axios.get("/api/transactions", { params: { uid } });
+      const txns = await axios.get(
+        "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api/transactions",
+        { params: { uid } }
+      );
       console.log("Fetched transactions:", txns.data);
     } catch (err) {
       console.error("Error in onSuccess:", err.response?.data || err.message);

@@ -1,7 +1,9 @@
-// hooks/fetchAndStoreTransactions.js
+// src/hooks/fetchAndStoreTransactions.js
 import axios from "axios";
 import { db } from "../firebase/firebase";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+
+const API_BASE_URL = "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api"; // replace with your deployed Vercel domain
 
 const fetchAndStoreTransactions = async (uid) => {
   if (!uid) {
@@ -10,7 +12,11 @@ const fetchAndStoreTransactions = async (uid) => {
   }
 
   try {
-    const response = await axios.get("/api/transactions", { params: { uid } });
+    const response = await axios.get(`${API_BASE_URL}/transactions`, {
+      params: { uid },
+      headers: { "Content-Type": "application/json" },
+    });
+
     const transactions = response.data;
 
     if (!Array.isArray(transactions)) {
@@ -24,20 +30,22 @@ const fetchAndStoreTransactions = async (uid) => {
         continue;
       }
 
+      // Check for duplicates
       const q = query(
         collection(db, "userPortfolios", uid, "Expenses"),
         where("transaction_id", "==", txn.transaction_id)
       );
-
       const existing = await getDocs(q);
       if (!existing.empty) continue;
 
       const cleanTxn = {
-        account_id: txn.account_id || "",
-        amount: txn.amount || 0,
-        category: Array.isArray(txn.category) ? txn.category.join(" > ") : "Uncategorized",
+        account_id: txn.account_id,
+        amount: txn.amount,
+        category: Array.isArray(txn.category)
+          ? txn.category.join(" > ")
+          : "Uncategorized",
         date: txn.date ? new Date(txn.date) : new Date(),
-        name: txn.name || "",
+        name: txn.name || "Unknown",
         transaction_id: txn.transaction_id,
         createdAt: new Date(),
       };
@@ -47,7 +55,10 @@ const fetchAndStoreTransactions = async (uid) => {
 
     console.log(`Transactions for user ${uid} saved to Firestore!`);
   } catch (err) {
-    console.error("Error fetching/storing transactions:", err.response?.data || err.message || err);
+    console.error(
+      "Error fetching/storing transactions:",
+      err.response?.data || err.message || err
+    );
   }
 };
 
