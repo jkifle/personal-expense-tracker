@@ -11,14 +11,14 @@ import {
   updateDoc,
   getDocs,
 } from "firebase/firestore";
-import { db } from "../firebase/firebase";
-import { useAuth } from "../contexts/authContexts";
-import ExpenseCard from "../components/ExpenseCard.jsx";
-import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
+import { db } from "../src/firebase/firebase.js";
+import { useAuth } from "../src/contexts/authContexts/index.jsx";
+import ExpenseCard from "../src/components/ExpenseCard.jsx";
+import refreshRecentPurchases from "../src/hooks/useRecentPurchases.jsx";
 import { VscAdd } from "react-icons/vsc";
-import PlaidConnect from "../components/PlaidConnect.jsx";
-import fetchAndStoreTransactions from "../hooks/fetchAndStoreTransactions.js";
-import MonthlyExpenseChart from "../components/MonthlyExpenseChart.jsx";
+import PlaidConnect from "../src/components/PlaidConnect.jsx";
+import fetchAndStoreTransactions from "../src/hooks/fetchAndStoreTransactions.js";
+import MonthlyExpenseChart from "../src/components/MonthlyExpenseChart.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();

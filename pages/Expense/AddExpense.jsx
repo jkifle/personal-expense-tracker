@@ -9,8 +9,8 @@ import {
   increment,
   setDoc,
 } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
-import { useAuth } from "../../contexts/authContexts";
+import { db } from "../../src/firebase/firebase";
+import { useAuth } from "../../src/contexts/authContexts";
 
 import "react-datepicker/dist/react-datepicker.css";
 

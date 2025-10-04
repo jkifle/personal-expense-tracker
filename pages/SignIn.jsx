@@ -5,12 +5,12 @@ import {
   signInStart,
   signInSuccess,
   signInFailure,
-} from "../redux/user/userSlice";
-import { useAuth } from "../contexts/authContexts";
+} from "../src/redux/user/userSlice";
+import { useAuth } from "../src/contexts/authContexts";
 import {
   doSignInWithGoogle,
   doSignInWithEmailAndPassword,
-} from "../firebase/auth";
+} from "../src/firebase/auth";
 
 const Login = () => {
   const { userLoggedIn } = useAuth();

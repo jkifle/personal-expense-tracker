@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { useAuth } from "../contexts/authContexts";
+import { useAuth } from "../src/contexts/authContexts";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import {
@@ -10,7 +10,7 @@ import {
   increment,
   setDoc,
 } from "firebase/firestore";
-import { db } from "../firebase/firebase";
+import { db } from "../src/firebase/firebase";
 
 import "react-datepicker/dist/react-datepicker.css";
 

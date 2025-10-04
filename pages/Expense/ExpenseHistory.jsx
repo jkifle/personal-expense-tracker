@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ExpenseCard from "../../components/ExpenseCard";
-import { useAuth } from "../../contexts/authContexts";
-import refreshRecentPurchases from "../../hooks/useRecentPurchases";
+import ExpenseCard from "../../src/components/ExpenseCard";
+import { useAuth } from "../../src/contexts/authContexts";
+import refreshRecentPurchases from "../../src/hooks/useRecentPurchases";
 const ExpenseHistory = () => {
   const { currentUser } = useAuth();
   const uid = currentUser.uid;

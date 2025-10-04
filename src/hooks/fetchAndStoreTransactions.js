@@ -6,11 +6,13 @@ export default async function fetchAndStoreTransactions(uid) {
     return [];
   }
 
-  // Dynamically detect environment (local vs production)
+  // Dynamically detect environment
   const isLocal = window?.location?.hostname === "localhost";
+
+  // ✅ Use relative path in production to avoid CORS issues
   const API_BASE_URL = isLocal
-    ? "http://localhost:3000/api" // your local dev server (Vercel or Express)
-    : "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api";
+    ? "http://localhost:5173/api" // local dev backend
+    : "/api"; // same origin on Vercel deployment
 
   try {
     const url = `${API_BASE_URL}/transactions?uid=${uid}`;

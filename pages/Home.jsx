@@ -1,5 +1,5 @@
 import React from "react";
-import Slideshow from "../components/PhotoCarousel";
+import Slideshow from "../src/components/PhotoCarousel.jsx";
 
 const Home = () => {
   return (

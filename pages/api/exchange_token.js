@@ -1,4 +1,4 @@
-import { DB } from "../../../lib/firebaseAdmin";
+import { DB } from "../../lib/firebaseAdmin";
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 
 const plaidClient = new PlaidApi(
