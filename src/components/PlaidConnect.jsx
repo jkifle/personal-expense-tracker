@@ -9,9 +9,7 @@ const PlaidConnect = () => {
   useEffect(() => {
     const createLinkToken = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:8000/create_link_token"
-        );
+        const response = await axios.post("/api/create_link_token");
         setLinkToken(response.data.link_token);
       } catch (error) {
         console.error("Error creating link token:", error);
@@ -25,13 +23,13 @@ const PlaidConnect = () => {
   const onSuccess = async (public_token, metadata) => {
     try {
       // 3. Exchange public token for access token
-      await axios.post("http://localhost:8000/exchange_token", {
+      await axios.post("/api/exchange_token", {
         public_token: public_token,
       });
       console.log("Public token exchanged");
 
       // 4. Optional: Fetch transactions
-      const response = await axios.get("http://localhost:8000/transactions");
+      const response = await axios.get("/api/transactions");
       console.log("Transactions:", response.data);
     } catch (error) {
       console.error("Error in onSuccess:", error);
