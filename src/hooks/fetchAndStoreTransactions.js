@@ -1,12 +1,8 @@
-// src/hooks/fetchAndStoreTransactions.js
+// hooks/fetchAndStoreTransactions.js
 import axios from "axios";
 import { db } from "../firebase/firebase";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
-/**
- * Fetch transactions from backend and store in Firestore under userPortfolios/uid/Expenses
- * @param {string} uid - Firebase UID of the current user
- */
 const fetchAndStoreTransactions = async (uid) => {
   if (!uid) {
     console.error("Missing UID in fetchAndStoreTransactions");
@@ -14,46 +10,44 @@ const fetchAndStoreTransactions = async (uid) => {
   }
 
   try {
-    // Fetch transactions from your API
     const response = await axios.get("/api/transactions", { params: { uid } });
     const transactions = response.data;
 
+    if (!Array.isArray(transactions)) {
+      console.error("Transactions response is not an array:", transactions);
+      return;
+    }
+
     for (const txn of transactions) {
-      // Check for duplicates using transaction_id
       if (!txn.transaction_id) {
         console.warn("Skipping transaction without ID:", txn);
         continue;
       }
-      const txnQuery = query(
+
+      const q = query(
         collection(db, "userPortfolios", uid, "Expenses"),
         where("transaction_id", "==", txn.transaction_id)
       );
-      const existing = await getDocs(txnQuery);
-      if (!existing.empty) continue; // Skip duplicate
 
-      // Prepare transaction object
+      const existing = await getDocs(q);
+      if (!existing.empty) continue;
+
       const cleanTxn = {
-        account_id: txn.account_id,
-        amount: txn.amount,
-        category: Array.isArray(txn.category)
-          ? txn.category.join(" > ")
-          : "Uncategorized",
+        account_id: txn.account_id || "",
+        amount: txn.amount || 0,
+        category: Array.isArray(txn.category) ? txn.category.join(" > ") : "Uncategorized",
         date: txn.date ? new Date(txn.date) : new Date(),
-        name: txn.name,
+        name: txn.name || "",
         transaction_id: txn.transaction_id,
         createdAt: new Date(),
       };
 
-      // Add to Firestore
       await addDoc(collection(db, "userPortfolios", uid, "Expenses"), cleanTxn);
     }
 
     console.log(`Transactions for user ${uid} saved to Firestore!`);
   } catch (err) {
-    console.error(
-      "Error fetching/storing transactions:",
-      err.response?.data || err.message || err
-    );
+    console.error("Error fetching/storing transactions:", err.response?.data || err.message || err);
   }
 };
 

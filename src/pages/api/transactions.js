@@ -1,47 +1,26 @@
-import { DB } from "../../../lib/firebaseAdmin";
-import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
-
-const plaidClient = new PlaidApi(
-    new Configuration({
-        basePath: PlaidEnvironments[process.env.PLAID_ENV],
-        baseOptions: {
-            headers: {
-                'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
-                'PLAID-SECRET': process.env.PLAID_SECRET,
-            },
-        },
-    })
-);
+// pages/api/transactions.js
+import { db } from "../../firebase/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export default async function handler(req, res) {
-    if (req.method !== 'GET') return res.status(405).end();
-
-    const uid = req.query.uid;
-    if (!uid) return res.status(400).json({ error: 'Missing UID' });
-
     try {
-        // Retrieve access token from Firestore
-        const tokenDoc = await DB
-            .collection('userPortfolios')
-            .doc(uid)
-            .collection('plaidToken')
-            .doc('token')
-            .get();
+        const { uid } = req.query;
 
-        if (!tokenDoc.exists) return res.status(404).json({ error: 'No token found' });
+        if (!uid) {
+            return res.status(400).json({ error: "Missing UID" });
+        }
 
-        const access_token = tokenDoc.data().access_token;
+        const expensesRef = collection(db, "userPortfolios", uid, "Expenses");
+        const snapshot = await getDocs(expensesRef);
 
-        // Fetch transactions from Plaid
-        const response = await plaidClient.transactionsGet({
-            access_token,
-            start_date: '2025-01-01', // adjust date range
-            end_date: '2025-12-31',
-        });
+        const transactions = snapshot.docs.map(doc => ({
+            docId: doc.id,
+            ...doc.data(),
+        }));
 
-        res.status(200).json(response.data.transactions);
+        return res.status(200).json(transactions);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'A server error has occurred' });
+        console.error("Error fetching transactions:", error);
+        return res.status(500).json({ error: "Failed to fetch transactions" });
     }
 }
