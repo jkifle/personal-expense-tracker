@@ -30,22 +30,17 @@ const PlaidConnect = () => {
 
   // 2️ Handler when user successfully links a bank account
   const onSuccess = async (public_token, metadata) => {
-    if (!currentUser) return; // prevent errors if user not logged in
+    if (!currentUser) return;
+    const uid = currentUser.uid;
 
     try {
-      const uid = currentUser.uid;
-
-      // 3️ Exchange public token for access token and store in Firestore
       await axios.post("/api/exchange_token", { public_token, uid });
       console.log("Public token exchanged and stored for user:", uid);
 
-      // 4️ Fetch transactions from backend
       const response = await axios.get("/api/transactions", {
         params: { uid },
       });
       console.log("Transactions fetched:", response.data);
-
-      // TODO: update your frontend state with transactions as needed
     } catch (error) {
       console.error(
         "Error in onSuccess:",
