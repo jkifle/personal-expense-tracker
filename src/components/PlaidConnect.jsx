@@ -58,16 +58,15 @@ const PlaidConnect = () => {
   return (
     <div className="flex justify-center">
       <button
-        className="border bg-white rounded-lg p-1 w-32 flex items-center justify-center"
+        className="border flex justify-center bg-white rounded-lg p-1 w-1/8"
         onClick={() => open()}
-        disabled={!ready || !linkToken}
+        disabled={!ready}
       >
         <img
-          src="/graphic/img/PlaidIcon.jpg" // ensure path is correct
-          alt="Connect Your Bank"
-          className="w-1/2"
+          className="w-2/3"
+          src="/graphic/img/PlaidIcon.jpg"
+          alt="Connect Your Bank with Plaid"
         />
-        <span className="ml-2 font-bold">Connect Bank</span>
       </button>
     </div>
   );
