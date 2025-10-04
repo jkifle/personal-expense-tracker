@@ -5,7 +5,7 @@ const NotFound = () => {
   return (
     <div className="h-screen mx-auto grid place-items-center text-center px-8">
       <div>
-        <img src="/public/graphic/img/sad.png" className="w-20 h-20 mx-auto" />
+        <img src="/graphic/img/sad.png" className="w-20 h-20 mx-auto" />
         <div
           variant="h1"
           color="blue-gray"

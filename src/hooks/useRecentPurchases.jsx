@@ -10,7 +10,7 @@ const refreshRecentPurchases = async (uid, setExpenseData, numEntries) => {
   const querySnapshot = await getDocs(q);
   const recentExpenses = querySnapshot.docs.map((docSnap) => ({
     docId: docSnap.id,
-    img: "/public/graphic/img/money.png",
+    img: "/graphic/img/money.png",
     name: docSnap.data().name,
     date: docSnap.data().date,
     amount: docSnap.data().amount,
