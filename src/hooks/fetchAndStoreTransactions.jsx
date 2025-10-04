@@ -4,7 +4,7 @@ import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
 const fetchAndStoreTransactions = async (uid) => {
   try {
-    const response = await axios.get("http://localhost:8000/transactions");
+    const response = await axios.get("/api/transactions");
     const transactions = response.data;
 
     for (const txn of transactions) {
