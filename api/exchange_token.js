@@ -1,6 +1,6 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
-import { setDoc, doc } from "firebase/firestore";
-import { db } from "../src/firebase/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 const config = new Configuration({
     basePath: PlaidEnvironments[process.env.PLAID_ENV],
@@ -18,17 +18,26 @@ export default async function handler(req, res) {
 
     try {
         const { public_token, uid } = req.body;
-        if (!public_token || !uid) return res.status(400).json({ error: "Missing public_token or uid" });
 
-        const tokenResponse = await plaidClient.itemPublicTokenExchange({ public_token });
+        if (!public_token || !uid)
+            return res.status(400).json({ error: "Missing public_token or uid" });
+
+        // Exchange public token for access token
+        const tokenResponse = await plaidClient.itemPublicTokenExchange({
+            public_token,
+        });
+
         const accessToken = tokenResponse.data.access_token;
 
-        // Store under db/userPortfolios/{uid}/plaidToken/token
-        await setDoc(doc(db, "userPortfolios", uid, "plaidToken", "token"), { accessToken });
+        // Store token in Firestore
+        await setDoc(
+            doc(db, "userPortfolios", uid, "plaidToken", "token"),
+            { accessToken }
+        );
 
         res.status(200).json({ message: "Access token stored successfully" });
     } catch (error) {
-        console.error("Error exchanging public token:", error.response?.data || error.message || error);
-        res.status(500).json({ error: "Failed to exchange public token" });
+        console.error("Exchange token error:", error.response?.data || error.message);
+        res.status(500).json({ error: "Failed to exchange and store token" });
     }
 }
