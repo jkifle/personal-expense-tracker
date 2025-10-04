@@ -12,22 +12,21 @@ const config = new Configuration({
 const plaidClient = new PlaidApi(config);
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).end();
-
-    const { uid } = req.body;
-    if (!uid) return res.status(400).json({ error: 'Missing UID' });
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method not allowed" });
+    }
 
     try {
-        const response = await plaidClient.linkTokenCreate({
-            user: { client_user_id: uid },
-            client_name: 'Expense Tracker App',
-            products: ['transactions'],
-            language: 'en',
-            country_codes: ['US'],
+        const linkTokenResponse = await plaidClient.linkTokenCreate({
+            user: { client_user_id: req.body.uid },
+            client_name: "Expense Tracker App",
+            products: ["transactions"],
+            language: "en",
+            country_codes: ["US"],
         });
-        res.status(200).json(response.data);
-    } catch (error) {
-        console.error('Error creating link token:', error.response?.data || error);
-        res.status(500).json({ error: 'Failed to create link token' });
+        res.status(200).json(linkTokenResponse.data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to create link token" });
     }
 }

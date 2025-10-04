@@ -20,6 +20,10 @@ const fetchAndStoreTransactions = async (uid) => {
 
     for (const txn of transactions) {
       // Check for duplicates using transaction_id
+      if (!txn.transaction_id) {
+        console.warn("Skipping transaction without ID:", txn);
+        continue;
+      }
       const txnQuery = query(
         collection(db, "userPortfolios", uid, "Expenses"),
         where("transaction_id", "==", txn.transaction_id)
