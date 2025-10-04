@@ -1,7 +1,7 @@
 // /api/transactions.js
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
 import { getDoc, doc } from "firebase/firestore";
-import { db } from "../../firebase/firebase"; // adjust path if needed
+import { db } from "../src/firebase/firebase"; // adjust path if needed
 
 // Initialize Plaid client using environment variables
 const config = new Configuration({
