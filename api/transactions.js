@@ -1,4 +1,6 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 const config = new Configuration({
     basePath: PlaidEnvironments[process.env.PLAID_ENV],
@@ -11,16 +13,18 @@ const config = new Configuration({
 });
 const plaidClient = new PlaidApi(config);
 
-// Demo only — you should store per-user tokens
-let accessToken = null;
-
 export default async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).end();
 
     try {
-        if (!accessToken) {
-            return res.status(400).json({ error: "No access token — link a bank first." });
+        const { uid } = req.query; // user ID from frontend
+
+        const tokenDoc = await getDoc(doc(db, "plaidTokens", uid));
+        if (!tokenDoc.exists()) {
+            return res.status(400).json({ error: "No access token found for this user." });
         }
+
+        const accessToken = tokenDoc.data().accessToken;
 
         const today = new Date().toISOString().split("T")[0];
         const past = new Date();
@@ -35,7 +39,7 @@ export default async function handler(req, res) {
 
         res.status(200).json(txns.data.transactions);
     } catch (error) {
-        console.error("🔥 Error in /transactions:", error.response?.data || error.message);
+        console.error("Error fetching transactions:", error.response?.data || error.message);
         res.status(500).json({ error: "Error fetching transactions" });
     }
 }

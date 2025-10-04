@@ -22,14 +22,15 @@ const PlaidConnect = () => {
   // 2. Define success handler when user links account
   const onSuccess = async (public_token, metadata) => {
     try {
-      // 3. Exchange public token for access token
-      await axios.post("/api/exchange_token", {
-        public_token: public_token,
-      });
+      // send uid from your auth context
+      const uid = currentUser.uid;
+
+      await axios.post("/api/exchange_token", { public_token, uid });
       console.log("Public token exchanged");
 
-      // 4. Optional: Fetch transactions
-      const response = await axios.get("/api/transactions");
+      const response = await axios.get("/api/transactions", {
+        params: { uid },
+      });
       console.log("Transactions:", response.data);
     } catch (error) {
       console.error("Error in onSuccess:", error);
