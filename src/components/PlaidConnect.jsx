@@ -7,13 +7,14 @@ const PlaidConnect = () => {
   const { currentUser } = useAuth(); // Get authenticated user
   const [linkToken, setLinkToken] = useState(null);
 
-  // 1️ Request a Plaid link token from backend
   useEffect(() => {
-    const createLinkToken = async () => {
-      if (!currentUser) return; // ensure user is logged in
+    if (!currentUser) return;
 
+    const createLinkToken = async () => {
       try {
-        const response = await axios.post("/api/create_link_token");
+        const response = await axios.post("/api/create_link_token", {
+          uid: currentUser.uid,
+        });
         setLinkToken(response.data.link_token);
       } catch (error) {
         console.error("Error creating link token:", error);

@@ -3,16 +3,21 @@ import { db } from "../firebase/firebase";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
 const fetchAndStoreTransactions = async (uid) => {
+  if (!uid) {
+    console.error("UID not provided, cannot fetch transactions");
+    return;
+  }
+
   try {
-    const response = await axios.get("/api/transactions");
+    const response = await axios.get(`/api/transactions?uid=${uid}`);
     const transactions = response.data;
 
     for (const txn of transactions) {
-      // Check for duplicates using transaction_id
       const q = query(
         collection(db, "userPortfolios", uid, "Expenses"),
         where("transaction_id", "==", txn.transaction_id)
       );
+
       const existing = await getDocs(q);
       if (!existing.empty) continue;
 
