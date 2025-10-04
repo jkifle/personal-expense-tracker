@@ -17,12 +17,12 @@ import ExpenseCard from "../components/ExpenseCard.jsx";
 import refreshRecentPurchases from "../hooks/useRecentPurchases.jsx";
 import { VscAdd } from "react-icons/vsc";
 import PlaidConnect from "../components/PlaidConnect.jsx";
-import fetchAndStoreTransactions from "../hooks/fetchAndStoreTransactions.jsx";
+import fetchAndStoreTransactions from "../hooks/fetchAndStoreTransactions.js";
 import MonthlyExpenseChart from "../components/MonthlyExpenseChart.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();
-  const uid = currentUser.uid;
+  const uid = currentUser?.uid;
   const entries = 3;
   const date = new Date();
   const monthYearKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
@@ -49,27 +49,31 @@ const Manager = () => {
   }, [expenseData]);
 
   useEffect(() => {
+    if (!uid) return;
+
     const initializeAndRefresh = async () => {
-      if (!uid) return;
+      try {
+        const docSnap = await getDoc(monthlyTotalDocRef);
+        if (!docSnap.exists()) {
+          await setDoc(monthlyTotalDocRef, {
+            totalOut: 0,
+            totalIn: 0,
+            spendingRating: 0,
+          });
+          setTotalOut(0);
+        } else {
+          setTotalOut(docSnap.data().totalOut);
+        }
 
-      const docSnap = await getDoc(monthlyTotalDocRef);
+        // Fetch/store transactions
+        await fetchAndStoreTransactions(uid);
 
-      if (!docSnap.exists()) {
-        await setDoc(monthlyTotalDocRef, {
-          totalOut: 0,
-          totalIn: 0,
-          spendingRating: 0,
-        });
-        setTotalOut(0);
-      } else {
-        const data = docSnap.data();
-        setTotalOut(data.totalOut);
+        // Refresh local state
+        await refreshDataBase();
+        await refreshRecentPurchases(uid, setExpenseData, 100);
+      } catch (err) {
+        console.error("Error initializing dashboard:", err);
       }
-
-      // Auto-refresh calculation on load
-      await fetchAndStoreTransactions(uid);
-      await refreshDataBase();
-      await refreshRecentPurchases(uid, setExpenseData, 100);
     };
 
     initializeAndRefresh();
