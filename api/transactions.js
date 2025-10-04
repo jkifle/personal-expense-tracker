@@ -1,9 +1,7 @@
-// /api/transactions.js
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
 import { getDoc, doc } from "firebase/firestore";
-import { db } from "../src/firebase/firebase"; // adjust path if needed
+import { db } from "../src/firebase/firebase";
 
-// Initialize Plaid client using environment variables
 const config = new Configuration({
     basePath: PlaidEnvironments[process.env.PLAID_ENV],
     baseOptions: {
@@ -17,61 +15,31 @@ const config = new Configuration({
 const plaidClient = new PlaidApi(config);
 
 export default async function handler(req, res) {
-    if (req.method !== "GET") {
-        return res.status(405).json({ error: "Method not allowed" });
-    }
+    if (req.method !== "GET") return res.status(405).end();
+
+    const { uid } = req.query;
+    if (!uid) return res.status(400).json({ error: "Missing uid" });
 
     try {
-        console.log("Incoming request query:", req.query);
+        const tokenDoc = await getDoc(doc(db, "plaidTokens", uid));
+        if (!tokenDoc.exists()) return res.status(400).json({ error: "No access token found for this user" });
 
-        const { uid } = req.query;
-        if (!uid) {
-            console.error("Missing UID in query params");
-            return res.status(400).json({ error: "UID is required" });
-        }
-        console.log("Fetching access token for UID:", uid);
+        const accessToken = tokenDoc.data().accessToken;
 
-        // Fetch access token from Firestore
-        const tokenDocRef = doc(db, "plaidTokens", uid);
-        const tokenDoc = await getDoc(tokenDocRef);
-
-        if (!tokenDoc.exists()) {
-            console.error(`No access token found for UID: ${uid}`);
-            return res.status(400).json({ error: "No access token found for this user" });
-        }
-
-        const accessToken = tokenDoc.data()?.accessToken;
-        if (!accessToken) {
-            console.error(`Access token is empty for UID: ${uid}`);
-            return res.status(400).json({ error: "Access token is missing" });
-        }
-        console.log("Access token retrieved successfully");
-
-        // Compute date range: last 30 days
         const today = new Date().toISOString().split("T")[0];
         const past = new Date();
         past.setDate(past.getDate() - 30);
         const thirtyDaysAgo = past.toISOString().split("T")[0];
-        console.log(`Fetching transactions from ${thirtyDaysAgo} to ${today}`);
 
-        // Call Plaid API safely
-        let transactions = [];
-        try {
-            const txnsResponse = await plaidClient.transactionsGet({
-                access_token: accessToken,
-                start_date: thirtyDaysAgo,
-                end_date: today,
-            });
-            transactions = txnsResponse.data.transactions || [];
-            console.log(`Retrieved ${transactions.length} transactions`);
-        } catch (plaidError) {
-            console.error("Plaid API error:", plaidError?.response?.data || plaidError?.message || plaidError);
-            return res.status(500).json({ error: "Error fetching transactions from Plaid" });
-        }
+        const txns = await plaidClient.transactionsGet({
+            access_token: accessToken,
+            start_date: thirtyDaysAgo,
+            end_date: today,
+        });
 
-        res.status(200).json(transactions);
+        return res.status(200).json(txns.data.transactions);
     } catch (error) {
-        console.error("Server error fetching transactions:", error?.message || error);
-        res.status(500).json({ error: "Internal server error fetching transactions" });
+        console.error("Error fetching transactions:", error.response?.data || error.message);
+        return res.status(500).json({ error: "Error fetching transactions" });
     }
 }
