@@ -1,57 +1,52 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+// src/components/PlaidConnect.jsx
+import React, { useState, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { useAuth } from "../contexts/authContexts";
+import axios from "axios";
 
-export default function PlaidConnect() {
-  const { currentUser } = useAuth();
+export default function PlaidConnect({ uid, onSuccess }) {
   const [linkToken, setLinkToken] = useState(null);
 
-  useEffect(() => {
-    if (!currentUser) return;
+  // Dynamically determine API base URL
+  const isLocal = window?.location?.hostname === "localhost";
+  const API_BASE_URL = isLocal
+    ? "http://localhost:3000/api"
+    : "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api";
 
+  useEffect(() => {
     const createLinkToken = async () => {
       try {
-        const res = await axios.get("/api/create_link_token", {
-          uid: currentUser.uid,
+        const response = await axios.post(`${API_BASE_URL}/create_link_token`, {
+          uid,
         });
-        setLinkToken(res.data.link_token);
+        setLinkToken(response.data.link_token);
       } catch (err) {
-        console.error("Error creating link token:", err);
+        console.error("❌ Error creating Plaid link token:", err);
       }
     };
 
-    createLinkToken();
-  }, [currentUser]);
+    if (uid) createLinkToken();
+  }, [uid]);
 
-  const onSuccess = async (public_token) => {
-    if (!currentUser) return;
-
-    try {
-      const uid = currentUser.uid;
-
-      await axios.post("/api/exchange_token", { public_token, uid });
-      console.log("Token exchanged for UID:", uid);
-
-      const txns = await axios.get(
-        "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api/transactions",
-        { params: { uid } }
-      );
-      console.log("Fetched transactions:", txns.data);
-    } catch (err) {
-      console.error("Error in onSuccess:", err.response?.data || err.message);
-    }
-  };
-
-  const { open, ready } = usePlaidLink({ token: linkToken, onSuccess });
+  const { open, ready } = usePlaidLink({
+    token: linkToken,
+    onSuccess: async (public_token, metadata) => {
+      try {
+        // Exchange the public_token for an access_token
+        await axios.post(`${API_BASE_URL}/exchange_public_token`, {
+          uid,
+          public_token,
+        });
+        console.log("✅ Plaid public token exchanged successfully");
+        if (onSuccess) onSuccess(metadata);
+      } catch (err) {
+        console.error("🚨 Error exchanging public token:", err);
+      }
+    },
+  });
 
   return (
-    <button
-      onClick={() => open()}
-      disabled={!ready}
-      className="border p-2 rounded bg-white"
-    >
-      Connect Your Bank
+    <button onClick={() => open()} disabled={!ready || !linkToken}>
+      Connect Bank Account
     </button>
   );
 }

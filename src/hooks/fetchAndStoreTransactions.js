@@ -6,13 +6,11 @@ export default async function fetchAndStoreTransactions(uid) {
     return [];
   }
 
-  // Dynamically detect environment
+  // Dynamically detect environment (local vs production)
   const isLocal = window?.location?.hostname === "localhost";
-
-  // ✅ Use relative path in production to avoid CORS issues
   const API_BASE_URL = isLocal
-    ? "http://localhost:5173/api" // local dev backend
-    : "/api"; // same origin on Vercel deployment
+    ? "http://localhost:3000/api" // local dev server
+    : "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api";
 
   try {
     const url = `${API_BASE_URL}/transactions?uid=${uid}`;
@@ -33,8 +31,15 @@ export default async function fetchAndStoreTransactions(uid) {
     }
 
     const data = await response.json();
-    console.log("✅ Transactions successfully fetched:", data);
-    return data.transactions || [];
+
+    // Validate that we received an array
+    if (!Array.isArray(data.transactions)) {
+      console.warn("⚠️ Transactions response is not an array:", data);
+      return [];
+    }
+
+    console.log("✅ Transactions successfully fetched:", data.transactions);
+    return data.transactions;
   } catch (error) {
     console.error("🚨 Error fetching/storing transactions:", error);
     return [];

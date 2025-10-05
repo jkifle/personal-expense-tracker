@@ -29,7 +29,9 @@ const App = () => {
                 <Route path="/expense-history" element={<ExpenseHistory />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
-              {/* <Route path="*" element={<NotFound />} /> */}
+              {/*
+              <Route path="*" element={<NotFound />} />
+              */}
             </Routes>
           </main>
           <Footer />
