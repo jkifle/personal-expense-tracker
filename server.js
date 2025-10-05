@@ -47,7 +47,6 @@ const plaidClient = new PlaidApi(plaidConfig);
 
 // ---- Plaid Endpoints ----
 app.post("/api/create_link_token", async (req, res) => {
-    console.log("AAAAAAAAAAAAAAAAAAAA");
     const { uid } = req.body;
 
     if (!uid) return res.status(400).json({ error: "Missing UID" });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   getDoc,
   setDoc,
@@ -22,24 +22,20 @@ import MonthlyExpenseChart from "../src/components/MonthlyExpenseChart.jsx";
 
 const Manager = () => {
   const { currentUser } = useAuth();
-  const uid = currentUser?.uid;
-  const entries = 3;
-  const date = new Date();
-  const monthYearKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
+  const [uid, setUid] = useState(null);
   const [totalOut, setTotalOut] = useState(null);
   const [expenseData, setExpenseData] = useState([]);
   const [recentData, setRecentData] = useState([]);
-  const monthlyTotalDocRef = doc(
-    db,
-    "userPortfolios",
-    uid,
-    "monthlyTotals",
-    monthYearKey
-  );
-  const handleTransactions = (transactions) => {
-    console.log("Fetched transactions:", transactions);
-    // You can now store in Firebase or update your UI
-  };
+  const entries = 3;
+  const date = new Date();
+  const monthYearKey = `${date.getMonth() + 1}-${date.getFullYear()}`;
+
+  useEffect(() => {
+    if (currentUser?.uid) {
+      setUid(currentUser.uid);
+    }
+  }, [currentUser]);
+
   useEffect(() => {
     if (expenseData.length > 0) {
       const recent = expenseData.slice(0, 3);
@@ -53,6 +49,14 @@ const Manager = () => {
 
     const initializeAndRefresh = async () => {
       try {
+        const monthlyTotalDocRef = doc(
+          db,
+          "userPortfolios",
+          uid,
+          "monthlyTotals",
+          monthYearKey
+        );
+
         const docSnap = await getDoc(monthlyTotalDocRef);
         if (!docSnap.exists()) {
           await setDoc(monthlyTotalDocRef, {
@@ -69,7 +73,7 @@ const Manager = () => {
         await fetchAndStoreTransactions(uid);
 
         // Refresh local state
-        await refreshDataBase();
+        await refreshDataBase(uid, monthlyTotalDocRef);
         await refreshRecentPurchases(uid, setExpenseData, 100);
       } catch (err) {
         console.error("Error initializing dashboard:", err);
@@ -79,13 +83,14 @@ const Manager = () => {
     initializeAndRefresh();
   }, [uid]);
 
-  const refreshDataBase = async () => {
+  const refreshDataBase = async (uid, monthlyTotalDocRef) => {
     const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     const startOfNextMonth = new Date(
       date.getFullYear(),
       date.getMonth() + 1,
       1
     );
+
     const q = query(
       collection(db, "userPortfolios", uid, "Expenses"),
       where("date", ">=", startOfMonth),
@@ -94,7 +99,6 @@ const Manager = () => {
 
     const querySnapshot = await getDocs(q);
 
-    // Reset totalOut before summing up again
     await updateDoc(monthlyTotalDocRef, { totalOut: 0 });
 
     for (const docSnap of querySnapshot.docs) {
@@ -104,10 +108,23 @@ const Manager = () => {
         totalOut: increment(amount),
       });
     }
-    // Re-fetch to reflect updated total
+
     const updatedSnap = await getDoc(monthlyTotalDocRef);
     setTotalOut(updatedSnap.data().totalOut);
   };
+
+  const handleTransactions = (transactions) => {
+    console.log("Fetched transactions:", transactions);
+  };
+
+  // ⏳ Wait for UID before rendering PlaidConnect or dashboard
+  if (!uid) {
+    return (
+      <div className="flex justify-center items-center h-screen text-lg text-white">
+        Loading user info...
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -117,21 +134,25 @@ const Manager = () => {
         <div className="p-2 text-6xl col-start-2 rounded-lg max-w-xs w-auto">
           {totalOut !== null ? `$${totalOut}` : "..."}
         </div>
+
         <div className="flex flex-row gap-3">
-          <Link className="" to={"/add-expense"}>
-            <ul className="border w-auto text-center p-3 rounded-lg ">
+          <Link to={"/add-expense"}>
+            <ul className="border w-auto text-center p-3 rounded-lg">
               <VscAdd />
             </ul>
           </Link>
-          <PlaidConnect onSuccessTransactions={handleTransactions} />
+
+          {/* ✅ Render PlaidConnect only when UID is ready */}
+          <PlaidConnect uid={uid} onSuccessTransactions={handleTransactions} />
         </div>
       </section>
+
       {/* Purchase History */}
-      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
+      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg bg-emerald-950">
         <div className="flex justify-between">
           <label className="p-2 text-lg font-black">Recent Purchases</label>
           <Link to={"/expense-history"}>
-            <ul className="border text-center p-2 rounded-lg  w-auto">
+            <ul className="border text-center p-2 rounded-lg w-auto">
               View All
             </ul>
           </Link>
@@ -154,19 +175,20 @@ const Manager = () => {
           ))}
         </div>
       </section>
+
       {/* Chart Display */}
-      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg l  bg-emerald-950">
+      <section className="mt-3 border p-3 max-w-4/6 mx-auto rounded-lg bg-emerald-950">
         <div className="flex justify-between">
           <label className="p-2 text-lg font-black">Monthly Spent</label>
           <Link to={"/expense-history"}>
-            <ul className="border text-center p-2 rounded-lg  w-auto">
+            <ul className="border text-center p-2 rounded-lg w-auto">
               View All
             </ul>
           </Link>
         </div>
-        {/* Purchase History */}
+
         <div className="mt-2 flex justify-center">
-          <MonthlyExpenseChart className="" expenses={expenseData} />
+          <MonthlyExpenseChart expenses={expenseData} />
         </div>
       </section>
     </div>

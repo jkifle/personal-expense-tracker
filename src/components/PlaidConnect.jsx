@@ -61,10 +61,15 @@ export default function PlaidConnect({ uid, onSuccess }) {
   });
 
   return (
-    <div>
-      <button onClick={() => open()} disabled={!ready || !linkToken || loading}>
-        {loading ? "Loading..." : "Connect Bank Account"}
+    <div className="bg-white p-4 rounded shadow">
+      <button
+        onClick={() => open()}
+        disabled={!ready || !linkToken}
+        className="border rounded-lg p-3 hover:bg-emerald-800"
+      >
+        {ready && linkToken ? "Connect Bank Account" : "Preparing Link..."}
       </button>
+
       {error && <p style={{ color: "red", marginTop: 8 }}>{error}</p>}
     </div>
   );
