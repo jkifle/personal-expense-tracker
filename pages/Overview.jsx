@@ -123,7 +123,6 @@ const Manager = () => {
               <VscAdd />
             </ul>
           </Link>
-
           <PlaidConnect onSuccessTransactions={handleTransactions} />
         </div>
       </section>

@@ -32,14 +32,14 @@ export default async function fetchAndStoreTransactions(uid) {
 
     const data = await response.json();
 
-    // Validate that we received an array
-    if (!Array.isArray(data.transactions)) {
+    if (!Array.isArray(data)) {
       console.warn("⚠️ Transactions response is not an array:", data);
       return [];
     }
 
-    console.log("✅ Transactions successfully fetched:", data.transactions);
-    return data.transactions;
+    console.log("✅ Transactions successfully fetched:", data);
+    return data;
+
   } catch (error) {
     console.error("🚨 Error fetching/storing transactions:", error);
     return [];

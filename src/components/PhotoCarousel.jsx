@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 const slides = [
-  { src: "/images/img1.jpg", caption: "Caption Text" },
-  { src: "/images/img2.jpg", caption: "Caption Two" },
-  { src: "/images/img3.jpg", caption: "Caption Three" },
+  { src: "/graphic/img/1.webp", caption: "Get Your Money Up" },
+  { src: "/graphic/img/2.png", caption: "Plaid Seamless Integration" },
+  { src: "/graphic/img/3.png", caption: "Clean Dashboard Design" },
 ];
 
 const Slideshow = () => {
