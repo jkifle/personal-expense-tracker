@@ -10,7 +10,7 @@ export default async function fetchAndStoreTransactions(uid) {
   const isLocal = window?.location?.hostname === "localhost";
   const API_BASE_URL = isLocal
     ? "http://localhost:3000/api" // local dev server
-    : "https://personal-expense-tracker-4rirpazjl-jkifles-projects.vercel.app/api";
+    : "https://personal-expense-tracker-643lv56a0-jkifles-projects.vercel.app/api";
 
   try {
     const url = `${API_BASE_URL}/transactions?uid=${uid}`;
