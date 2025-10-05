@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         }));
 
         console.log(`✅ Retrieved ${transactions.length} transactions for UID: ${uid}`);
-        res.status(200).json({ transactions });
+        res.status(200).json(transactions);
     } catch (err) {
         console.error("🚨 Error fetching transactions:", err);
         res.status(500).json({ error: "Failed to fetch transactions" });
