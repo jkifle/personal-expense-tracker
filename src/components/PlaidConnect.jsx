@@ -29,10 +29,10 @@ export default function PlaidConnect({ uid, onSuccess }) {
         const response = await axios.post(`${API_BASE_URL}/create_link_token`, {
           uid,
         });
-        console.log("✅ Link token received:", response.data.link_token);
+        console.log("Link token received:", response.data.link_token);
         setLinkToken(response.data.link_token);
       } catch (err) {
-        console.error("❌ Error creating Plaid link token:", err);
+        console.error("Error creating Plaid link token:", err);
         setError("Failed to create link token");
       } finally {
         setLoading(false);
@@ -47,27 +47,43 @@ export default function PlaidConnect({ uid, onSuccess }) {
     token: linkToken,
     onSuccess: async (public_token, metadata) => {
       try {
+        console.log("Exchanging public token...");
         await axios.post(`${API_BASE_URL}/exchange_public_token`, {
           uid,
           public_token,
         });
-        console.log("✅ Plaid public token exchanged successfully");
+        console.log("Public token exchanged successfully");
+
+        // Immediately fetch & store transactions from Plaid
+        const txResponse = await axios.get(
+          `${API_BASE_URL}/plaid/transactions`,
+          {
+            params: { uid },
+          }
+        );
+        console.log(
+          `Retrieved & stored ${txResponse.data.transactions.length} transactions`
+        );
+
         if (onSuccess) onSuccess(metadata);
       } catch (err) {
-        console.error("🚨 Error exchanging public token:", err);
-        setError("Failed to exchange public token");
+        console.error("Error in Plaid connection flow:", err);
       }
     },
   });
 
   return (
-    <div className="bg-white p-4 rounded shadow">
+    <div className="flex justify-left">
       <button
         onClick={() => open()}
         disabled={!ready || !linkToken}
-        className="border rounded-lg p-3 hover:bg-emerald-800"
+        className="border flex justify-center bg-white rounded-lg p-1 w-1/8"
       >
-        {ready && linkToken ? "Connect Bank Account" : "Preparing Link..."}
+        <img
+          className="w-2/3"
+          src="/graphic/img/PlaidIcon.jpg"
+          alt="Connect Your Bank with Plaid"
+        />
       </button>
 
       {error && <p style={{ color: "red", marginTop: 8 }}>{error}</p>}

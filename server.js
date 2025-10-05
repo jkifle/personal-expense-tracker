@@ -27,9 +27,9 @@ try {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
     });
-    console.log("✅ Firebase Admin initialized successfully");
+    console.log("Firebase Admin initialized successfully");
 } catch (err) {
-    console.error("🚨 Failed to initialize Firebase Admin:", err);
+    console.error("Failed to initialize Firebase Admin:", err);
 }
 
 
@@ -63,7 +63,7 @@ app.post("/api/create_link_token", async (req, res) => {
         const linkToken = response.data.link_token;
         res.json({ link_token: linkToken });
     } catch (err) {
-        console.error("❌ Error creating Plaid link token:", err.response?.data || err);
+        console.error("Error creating Plaid link token:", err.response?.data || err);
         res.status(500).json({ error: "Failed to create link token" });
     }
 });
@@ -98,14 +98,71 @@ app.post("/api/exchange_public_token", async (req, res) => {
             { merge: true } // Merge so we don't overwrite other user data
         );
 
-        console.log(`✅ Stored Plaid access_token for UID: ${uid}`);
+        console.log(`Stored Plaid access_token for UID: ${uid}`);
         res.json({ success: true });
     } catch (err) {
         console.error(
-            "🚨 Error exchanging public token:",
+            "Error exchanging public token:",
             err.response?.data || err
         );
         res.status(500).json({ error: "Failed to exchange public token" });
+    }
+});
+// ---- Fetch and Store Plaid Transactions ----
+app.get("/api/plaid/transactions", async (req, res) => {
+    const { uid } = req.query;
+    if (!uid) return res.status(400).json({ error: "Missing UID" });
+
+    try {
+        // 1️ Retrieve Plaid access_token from Firestore
+        const userRef = admin.firestore().collection("userPortfolios").doc(uid);
+        const userDoc = await userRef.get();
+        const plaidData = userDoc.data()?.plaid;
+
+        if (!plaidData?.access_token) {
+            return res.status(400).json({ error: "No Plaid access token found for user" });
+        }
+
+        // 2️ Fetch transactions from Plaid API
+        const startDate = "2024-09-01"; // choose a reasonable range or compute dynamically
+        const endDate = new Date().toISOString().split("T")[0];
+
+        const plaidRes = await plaidClient.transactionsGet({
+            access_token: plaidData.access_token,
+            start_date: startDate,
+            end_date: endDate,
+        });
+
+        const transactions = plaidRes.data.transactions;
+        console.log(`Retrieved ${transactions.length} transactions from Plaid for UID: ${uid}`);
+
+        // 3️ Store each transaction in Firestore
+        const expensesRef = userRef.collection("Expenses");
+        const batch = admin.firestore().batch();
+
+        transactions.forEach((tx) => {
+            const docRef = expensesRef.doc(tx.transaction_id);
+            batch.set(docRef, {
+                name: tx.name,
+                amount: tx.amount,
+                date: new Date(tx.date),
+                category: tx.category?.[0] || "Uncategorized",
+                merchant_name: tx.merchant_name || null,
+                pending: tx.pending,
+                account_id: tx.account_id,
+                plaid_id: tx.transaction_id,
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+        });
+
+        await batch.commit();
+        console.log(`Stored ${transactions.length} transactions in Firestore for UID: ${uid}`);
+
+        // 4️ Return the transactions to frontend
+        res.json({ transactions });
+    } catch (err) {
+        console.error("Error fetching/storing Plaid transactions:", err.response?.data || err);
+        res.status(500).json({ error: "Failed to fetch/store Plaid transactions" });
     }
 });
 
@@ -149,5 +206,5 @@ app.get("/*", (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
