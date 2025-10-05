@@ -10,6 +10,8 @@ import Footer from "./components/Footer.jsx";
 import AddExpense from "../pages/Expense/AddExpense.jsx";
 import NotFound from "./components/NotFound";
 import ExpenseHistory from "../pages/Expense/ExpenseHistory.jsx";
+import About from "../pages/About.jsx";
+import Contact from "../pages/Contact.jsx";
 
 const App = () => {
   return (
@@ -22,6 +24,8 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
               <Route element={<PrivateRoute />}>
                 <Route path="/overview" element={<Overview />} />
 
@@ -29,9 +33,7 @@ const App = () => {
                 <Route path="/expense-history" element={<ExpenseHistory />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
-              {/*
               <Route path="*" element={<NotFound />} />
-              */}
             </Routes>
           </main>
           <Footer />

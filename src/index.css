@@ -38,8 +38,14 @@ h1 {
 li {
   text-decoration: none; 
   color: light-dark(#010409,white);
+  font-weight: 700;
 }
 
 li:hover {
    color: light-dark(black, rgb(35, 75, 75));
+}
+
+p {
+  color: light-dark(#010409, white);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 }
