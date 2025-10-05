@@ -5,8 +5,7 @@
   "scripts": {
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "vite"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
