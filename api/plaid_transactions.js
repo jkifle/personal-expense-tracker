@@ -1,4 +1,5 @@
-import { admin, plaidClient } from "./_init.js";
+// api/plaid_transactions.js
+import { plaidClient, admin } from "./_init.js";
 
 export default async function handler(req, res) {
     if (req.method !== "GET") {
@@ -27,33 +28,12 @@ export default async function handler(req, res) {
         });
 
         const transactions = plaidRes.data.transactions;
-        const batch = admin.firestore().batch();
-        const expensesRef = userRef.collection("Expenses");
+        console.log(`✅ Retrieved ${transactions.length} transactions from Plaid for UID: ${uid}`);
 
-        transactions.forEach((tx) => {
-            const docRef = expensesRef.doc(tx.transaction_id);
-            batch.set(
-                docRef,
-                {
-                    name: tx.name,
-                    amount: tx.amount,
-                    date: new Date(tx.date),
-                    category: tx.category?.[0] || "Uncategorized",
-                    merchant_name: tx.merchant_name || null,
-                    pending: tx.pending,
-                    account_id: tx.account_id,
-                    plaid_id: tx.transaction_id,
-                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                },
-                { merge: true }
-            );
-        });
-
-        await batch.commit();
-        console.log(`✅ Stored ${transactions.length} transactions for UID: ${uid}`);
+        // Return Plaid data only — no Firestore writes
         res.status(200).json({ transactions });
     } catch (err) {
-        console.error("🚨 Error fetching/storing transactions:", err.response?.data || err);
-        res.status(500).json({ error: "Failed to fetch/store Plaid transactions" });
+        console.error("🚨 Error fetching Plaid transactions:", err.response?.data || err);
+        res.status(500).json({ error: "Failed to fetch Plaid transactions" });
     }
 }
