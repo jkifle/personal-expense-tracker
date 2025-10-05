@@ -9,10 +9,7 @@ export default function PlaidConnect({ uid, onSuccess }) {
   const [error, setError] = useState(null);
 
   // Determine API base URL dynamically
-  const isLocal = window?.location?.hostname === "localhost";
-  const API_BASE_URL = isLocal
-    ? "http://localhost:3000/api"
-    : "https://personal-expense-tracker-643lv56a0-jkifles-projects.vercel.app/api";
+  const API_BASE_URL = `${window.location.origin}/api`;
 
   // Fetch link token when UID is available
   useEffect(() => {

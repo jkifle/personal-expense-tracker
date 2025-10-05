@@ -7,7 +7,6 @@ export default async function fetchAndStoreTransactions(uid) {
   }
 
   // Dynamically detect environment (local vs production)
-  const isLocal = window?.location?.hostname === "localhost";
   const API_BASE_URL = `${window.location.origin}/api`;
 
   try {
